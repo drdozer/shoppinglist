@@ -312,23 +312,23 @@ var UserChirps = React.createClass({
 
 var LoginForm = React.createClass({
     getInitialState: function() {
-        return {userId: ""};
+        return {email: ""};
     },
-    handleUserIdChange: function(e) {
-        this.setState({userId: e.target.value});
+    handleEmailChange: function(e) {
+        this.setState({email: e.target.value});
     },
     handleSubmit: function(e) {
         e.preventDefault();
-        var userId = this.state.userId.trim();
-        if (!userId) {
+        var email = this.state.email.trim();
+        if (!email) {
             return;
         } else {
-            getUser(userId).then(function (user) {
+            getUser(email).then(function (user) {
                 if (user) {
                     localStorage.userId = user.userId;
                     this.props.onLogin(user);
                 } else {
-                    this.setState({error: "User " + userId + " does not exist."});
+                    this.setState({error: "User with email " + email + " does not exist."});
                 }
             }.bind(this));
         }
@@ -343,9 +343,9 @@ var LoginForm = React.createClass({
                 <div className="small-12 large-4 columns">
                     <form className="loginForm" onSubmit={this.handleSubmit}>
                         <input type="text"
-                               placeholder="Username..."
-                               value={this.state.userId}
-                               onChange={this.handleUserIdChange}
+                               placeholder="your@name..."
+                               value={this.state.email}
+                               onChange={this.handleEmailChange}
                         />
                         {error}
                         <input type="submit" value="Login" />
@@ -466,7 +466,7 @@ var PageLayout = React.createClass({
                  <div id="site-header">
                      <div className="row">
                          <div className="small-3 columns">
-                             <Link to="/" id="logo">Chirper</Link>
+                             <Link to="/" id="logo">Shoppinglister</Link>
                          </div>
                          <div className="small-9 columns">
                              <nav>

@@ -59,7 +59,8 @@ lazy val `web-ui` = (project in file("web-ui"))
         "org.webjars" % "react" % "0.14.3",
         "org.webjars" % "react-router" % "1.0.3",
         "org.webjars" % "jquery" % "2.2.0",
-        "org.webjars" % "foundation" % "5.3.0"
+        "org.webjars" % "foundation" % "5.3.0",
+        macwire
       ),
       ReactJsKeys.sourceMapInline := true
     )

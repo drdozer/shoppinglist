@@ -27,7 +27,7 @@ trait ShoppingListService extends Service {
     named("shoppinglist").withCalls(
       pathCall("/api/shoppinglist", createList),
       pathCall("/api/shoppinglist/:id", getList _),
-      pathCall("/api/shoppinglist/:id", shareList _),
+      pathCall("/api/shoppinglist/:id/sharedWith", shareList _),
       pathCall("/api/shoppinglist/:id/items", addItem _)
     ).withAutoAcl(true)
   }
