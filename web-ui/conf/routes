@@ -1,0 +1,4 @@
+GET     /               controllers.Application.index
+GET     /signup         controllers.Application.index
+GET     /addFriend      controllers.Application.index
+GET     /assets/*file   controllers.Assets.versioned(path = "/public", file)
