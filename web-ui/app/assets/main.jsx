@@ -20,7 +20,22 @@ function sendJson(params) {
     return $.ajax(params);
 }
 
-function getUser(userId) {
+function getUserByEmail(emailAddress) {
+    return sendJson({
+        url: "/api/users/byEmail",
+        type: "POST",
+        data: emailAddress
+    }).then(
+        function(user) {
+            return user;
+        },
+        function() {
+            return $.when(null);
+        }
+    );
+}
+
+function getUserById(userId) {
     return $.ajax({
         url: "/api/users/" + userId,
         type: "GET"
@@ -103,7 +118,7 @@ var ChirpStream = React.createClass({
     loadUser: function(userId) {
         if (!this.loadingUsers.hasOwnProperty(userId)) {
             this.loadingUsers[userId] = true;
-            getUser(userId).then(function(user) {
+            getUserById(userId).then(function(user) {
                 if (user) {
                     var newUsers = this.state.users;
                     newUsers[userId] = user;
@@ -194,7 +209,7 @@ var AddFriendPage = React.createClass({
             return;
         }
         // First, validate that the friend exsits
-        getUser(friendId).then(function(friend) {
+        getUserById(friendId).then(function(friend) {
             if (friend) {
                 sendJson({
                     url: "/api/users/" + localStorage.userId + "/friends",
@@ -259,12 +274,12 @@ var ActivityStream = React.createClass({
     }
 });
 
-var UserChirps = React.createClass({
+var UserShoppingLists = React.createClass({
     getInitialState: function() {
         return {notFound: false};
     },
     componentDidMount: function() {
-        getUser(this.props.params.userId).then(function(user) {
+        getUserById(this.props.params.userId).then(function(user) {
             if (user) {
                 this.setState({user: user});
             } else {
@@ -281,27 +296,28 @@ var UserChirps = React.createClass({
                 </div>
             );
         } else {
-            var chirpForm;
-            if (userId == localStorage.userId) {
-                chirpForm = <ChirpForm />
-            }
-            var userName;
-            var chirpStream;
-            if (this.state.user) {
-                userName = this.state.user.name;
-                var users = {};
-                users[userId] = this.state.user;
-                chirpStream = <ChirpStream stream={createUserStream(userId)} users={users}/>;
-            } else {
-                userName = userId;
-                chirpStream = <ChirpStream stream={createUserStream(userId)} users={{}}/>;
-            }
+            // var chirpForm;
+            // if (userId == localStorage.userId) {
+            //     chirpForm = <ChirpForm />
+            // }
+            // var userName;
+            // var chirpStream;
+            // if (this.state.user) {
+            //     userName = this.state.user.name;
+            //     var users = {};
+            //     users[userId] = this.state.user;
+            //     chirpStream = <ChirpStream stream={createUserStream(userId)} users={users}/>;
+            // } else {
+            //     userName = userId;
+            //     chirpStream = <ChirpStream stream={createUserStream(userId)} users={{}}/>;
+            // }
+            var email = this.state.email;
             return (
-                <ContentLayout subtitle={"Chirps for " + userName}>
+                <ContentLayout subtitle={"Shopping lists for " + email}>
                     <Section>
                         <div className="small-12 columns">
-                            {chirpForm}
-                            {chirpStream}
+                            {/*{chirpForm}*/}
+                            {/*{chirpStream}*/}
                         </div>
                     </Section>
                 </ContentLayout>
@@ -323,7 +339,8 @@ var LoginForm = React.createClass({
         if (!email) {
             return;
         } else {
-            getUser(email).then(function (user) {
+            getUserq({email: email}).then(function (user) {
+            getUserq({email: email}).then(function (user) {
                 if (user) {
                     localStorage.userId = user.userId;
                     this.props.onLogin(user);
@@ -358,31 +375,27 @@ var LoginForm = React.createClass({
 
 var SignUpPage = React.createClass({
     getInitialState: function() {
-        return {userId: "", name: ""};
+        return {email: ""};
     },
-    handleUserIdChange: function(e) {
-        this.setState({userId: e.target.value});
-    },
-    handleNameChange: function(e) {
-        this.setState({name: e.target.value});
+    handleEmailChange: function(e) {
+        this.setState({email: e.target.value});
     },
     handleSubmit: function(e) {
         e.preventDefault();
-        var userId = this.state.userId.trim();
-        var name = this.state.name.trim();
-        if (!userId || !name) {
+        var email = this.state.email.trim();
+        if (!email) {
             return;
         } else {
-            var user = {userId: userId, name: name};
+            var emailAddress = {email: email};
             sendJson({
                 url: "/api/users",
                 type: "POST",
-                data: user
-            }).then(function () {
-                localStorage.userId = userId;
+                data: emailAddress
+            }).done(function (user) {
+                localStorage.user = user;
                 this.props.history.pushState(null, "/");
-            }.bind(this), function() {
-                this.setState("User " + userId + " already exists.");
+            }.bind(this)).fail(function(xhr) { // fixme: this isn't getting inoked -- sendJson is raising an exception
+                this.setState("User with email address " + email + " already exists.");
             }.bind(this));
         }
     },
@@ -398,14 +411,9 @@ var SignUpPage = React.createClass({
                         <div className="small-12 large-4 columns">
                             <form className="signupForm" onSubmit={this.handleSubmit}>
                                 <input type="text"
-                                       placeholder="Username..."
-                                       value={this.state.userId}
-                                       onChange={this.handleUserIdChange}
-                                />
-                                <input type="text"
-                                       placeholder="Name..."
-                                       value={this.state.name}
-                                       onChange={this.handleNameChange}
+                                       placeholder="your@email..."
+                                       value={this.state.email}
+                                       onChange={this.handleEmailChange}
                                 />
                                 {error}
                                 <input type="submit" value="Sign up" />
@@ -509,7 +517,7 @@ var App = React.createClass({
     },
     componentDidMount: function() {
         if (localStorage.userId) {
-            getUser(localStorage.userId).then(function (user) {
+            getUserById(localStorage.userId).then(function (user) {
                 if (user) {
                     this.setState({loginChecked: true, user: user});
                 } else {
@@ -556,9 +564,9 @@ ReactDOM.render(
     <ReactRouter.Router history={History.createHistory()}>
         <Route path="/signup" component={SignUpPage}/>
         <Route path="/" component={App}>
-            <IndexRoute component={ActivityStream}/>
-            <Route path="/users/:userId" component={UserChirps}/>
-            <Route path="/addFriend" component={AddFriendPage}/>
+            <IndexRoute component={UserShoppingLists}/>
+            {/*<Route path="/users/:userId" component={UserShoppingLists}/>*/}
+            {/*<Route path="/addFriend" component={AddFriendPage}/>*/}
         </Route>
     </ReactRouter.Router>,
     document.getElementById("content")
