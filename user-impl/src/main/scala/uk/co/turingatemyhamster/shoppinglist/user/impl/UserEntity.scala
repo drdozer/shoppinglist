@@ -3,8 +3,10 @@ package uk.co.turingatemyhamster.shoppinglist.user.impl
 import java.time.Instant
 
 import akka.NotUsed
+import com.lightbend.lagom.scaladsl.api.transport.NotFound
 import com.lightbend.lagom.scaladsl.persistence.PersistentEntity
 import play.api.libs.json.{Format, Json}
+
 import scala.collection.immutable
 import uk.co.turingatemyhamster.shoppinglist.user.api.{User, UserFriends}
 
@@ -24,7 +26,6 @@ class UserEntity extends PersistentEntity {
   override def behavior: Behavior = {
     case UserState(maybeUserWithFriends, _) => Actions().onCommand[CreateUser, User] {
       case (CreateUser(userId, email), ctx, state) =>
-        // todo: should look up users by email and fail if any already exists
         val newUser = User(userId = userId, email = email)
         ctx.thenPersist(
           UserCreated(newUser.userId, newUser.email)
@@ -41,12 +42,12 @@ class UserEntity extends PersistentEntity {
         }
     }.onReadOnlyCommand[GetUser, User] {
       case (GetUser(userId), ctx, UserState(None, _)) =>
-        ctx.invalidCommand(s"No user for id: $userId")
+        ctx.commandFailed(NotFound(s"No user for id: $userId"))
       case (GetUser(userId), ctx, UserState(Some(withFriends), _)) =>
         ctx.reply(User(userId = withFriends.userId, email = withFriends.email))
     }.onReadOnlyCommand[ListFriends, UserFriends] {
       case (ListFriends(userId), ctx, UserState(None, _)) =>
-        ctx.invalidCommand(s"No user for id: $userId")
+        ctx.commandFailed(NotFound(s"No user for id: $userId"))
       case (ListFriends(userId), ctx, UserState(Some(withFriends), _)) =>
         ctx.reply(UserFriends(userId = userId, friends = withFriends.friends))
     }.onEvent {

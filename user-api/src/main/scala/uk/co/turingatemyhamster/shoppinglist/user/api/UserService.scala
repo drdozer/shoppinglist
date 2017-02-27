@@ -22,11 +22,17 @@ trait UserService extends Service {
 
   def listFriends(userId: String): ServiceCall[NotUsed, UserFriends]
 
+  def getAllUsers: ServiceCall[NotUsed, Users]
+
+  def queryByEmail: ServiceCall[EmailAddress, User]
+
   override final def descriptor = {
     import Service._
 
     named("user").withCalls(
       pathCall("/api/users", createUser),
+      pathCall("/api/users", getAllUsers),
+      pathCall("/api/users/byEmail", queryByEmail),
       pathCall("/api/users/:userId", getUser _),
       pathCall("/api/users/:userId/friends", addFriend _),
       pathCall("/api/users/:userId/friends", listFriends _)
@@ -46,6 +52,13 @@ case class User(userId: String, email: String)
 
 object User {
   implicit val format: Format[User] = Json.format
+}
+
+
+case class Users(users: immutable.Seq[User])
+
+object Users {
+  implicit val format: Format[Users] = Json.format
 }
 
 

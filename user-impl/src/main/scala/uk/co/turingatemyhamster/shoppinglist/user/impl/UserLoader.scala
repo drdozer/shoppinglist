@@ -4,10 +4,13 @@ import com.lightbend.lagom.scaladsl.api.ServiceLocator
 import com.lightbend.lagom.scaladsl.api.ServiceLocator.NoServiceLocator
 import com.lightbend.lagom.scaladsl.devmode.LagomDevModeComponents
 import com.lightbend.lagom.scaladsl.persistence.cassandra.CassandraPersistenceComponents
-import com.lightbend.lagom.scaladsl.server.{LagomApplication, LagomApplicationContext, LagomApplicationLoader, LagomServer}
+import com.lightbend.lagom.scaladsl.server._
 import play.api.libs.ws.ahc.AhcWSComponents
 import uk.co.turingatemyhamster.shoppinglist.user.api.UserService
 import com.softwaremill.macwire._
+import play.api.Environment
+
+import scala.concurrent.ExecutionContext
 
 
 /**
@@ -29,11 +32,12 @@ class UserLoader extends LagomApplicationLoader {
   )
 }
 
-abstract class UserApplication(context: LagomApplicationContext)
-  extends LagomApplication(context)
+trait UserComponents
+  extends LagomServerComponents
           with CassandraPersistenceComponents
-          with AhcWSComponents
 {
+  implicit def executionContext: ExecutionContext
+  def environment: Environment
 
   override lazy val lagomServer = LagomServer.forServices(
     bindService[UserService].to(wire[UserServiceImpl])
@@ -41,5 +45,16 @@ abstract class UserApplication(context: LagomApplicationContext)
 
   override lazy val jsonSerializerRegistry = UserSerializerRegistry
 
+  lazy val userRepository = wire[UserRepository]
+
   persistentEntityRegistry.register(wire[UserEntity])
+
+  readSide.register(wire[UserEventProcessor])
+}
+
+abstract class UserApplication(context: LagomApplicationContext)
+  extends LagomApplication(context)
+          with UserComponents
+          with AhcWSComponents
+{
 }
