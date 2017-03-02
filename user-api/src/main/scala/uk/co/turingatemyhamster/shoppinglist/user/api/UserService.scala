@@ -39,38 +39,3 @@ trait UserService extends Service {
     ).withAutoAcl(true)
   }
 }
-
-
-case class EmailAddress(email: String)
-
-object EmailAddress {
-  implicit val format: Format[EmailAddress] = Json.format
-}
-
-
-case class User(userId: String, email: String)
-
-object User {
-  implicit val format: Format[User] = Json.format
-}
-
-
-case class Users(users: immutable.Seq[User])
-
-object Users {
-  implicit val format: Format[Users] = Json.format
-}
-
-
-case class UserFriends(userId: String, friends: immutable.Seq[String])
-
-object UserFriends {
-  implicit val format: Format[UserFriends] = Json.format
-}
-
-
-case class FriendId(id: String)
-
-object FriendId {
-  implicit val format: Format[FriendId] = Json.format
-}
