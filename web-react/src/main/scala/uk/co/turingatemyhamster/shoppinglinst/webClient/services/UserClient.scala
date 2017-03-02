@@ -1,4 +1,4 @@
-package spatutorial.client.services
+package uk.co.turingatemyhamster.shoppinglinst.webClient.services
 
 import upickle.default._
 
@@ -12,23 +12,25 @@ import scala.concurrent.Future
   * @author Matthew Pocock
   */
 class UserClient(ajaxClient: AjaxClient) {
-  def createUser(emailAddress: UserClient.EmailAddress): Future[UserClient.User] =
+  import UserClient._
+
+  def createUser(emailAddress: EmailAddress): Future[User] =
     ajaxClient.post[UserClient.EmailAddress, UserClient.User]("/api/users", emailAddress)
 
-  def getAllUsers: Future[UserClient.Users] =
-    ajaxClient.get[UserClient.Users]("/api/users")
+  def getAllUsers: Future[Users] =
+    ajaxClient.get[Users]("/api/users")
 
-  def getUser(userId: String): Future[UserClient.User] =
-    ajaxClient.get[UserClient.User]("/api/users/$userId")
+  def getUser(userId: String): Future[User] =
+    ajaxClient.get[User]("/api/users/$userId")
 
-  def queryByEmail(emailAddress: UserClient.EmailAddress): Future[UserClient.User] =
-    ajaxClient.post[UserClient.EmailAddress, UserClient.User]("/api/users/byEmail", emailAddress)
+  def queryByEmail(emailAddress: EmailAddress): Future[User] =
+    ajaxClient.post[EmailAddress, User]("/api/users/byEmail", emailAddress)
 
-  def addFriend(userId: String, friendId: UserClient.FriendId): Future[Unit] =
-    ajaxClient.post[UserClient.FriendId, Unit]("/api/users/$userId", friendId)
+  def addFriend(userId: String, friendId: FriendId): Future[Unit] =
+    ajaxClient.post[FriendId, Unit]("/api/users/$userId", friendId)
 
-  def listFriends(userId: String): Future[UserClient.UserFriends] =
-    ajaxClient.get[UserClient.UserFriends]("/api/users/$userId/friends")
+  def listFriends(userId: String): Future[UserFriends] =
+    ajaxClient.get[UserFriends]("/api/users/$userId/friends")
 }
 
 object UserClient {

@@ -1,10 +1,17 @@
 package uk.co.turingatemyhamster.shoppinglinst.webClient
 
+import diode.Circuit
+import diode.react.ReactConnector
+
 /**
   *
   *
   * @author Matthew Pocock
   */
-class SLRCircuit {
+object SLRCircuit extends Circuit[UserStatus[Unit, Unit]] with ReactConnector[UserStatus[Unit, Unit]] {
+
+  override protected def initialModel = UserIsLoggedOut(())
+
+  override protected val actionHandler = composeHandlers()
 
 }

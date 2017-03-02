@@ -3,16 +3,13 @@
  */
 package controllers
 
+import play.api.{Configuration, Environment}
 import play.api.mvc._
 
-class Application extends Controller {
+class Application(implicit val config: Configuration, env: Environment) extends Controller {
 
   def index = Action {
-    Ok(views.html.index.render())
-  }
-
-  def userStream(userId: String) = Action {
-    Ok(views.html.index.render())
+    Ok(views.html.index.render("SPA tutorial hack", config, env)) // views generated code is merging parameter lists
   }
 
 }

@@ -27,6 +27,9 @@ abstract class WebGateway(context: Context) extends BuiltInComponentsFromContext
 
   override implicit lazy val executionContext: ExecutionContext = actorSystem.dispatcher
 
+  protected implicit lazy val playConfig = context.initialConfiguration
+  protected implicit lazy val playEnv = context.environment
+
   override lazy val router: Routes = {
     val prefix = "/"
     wire[Routes]
