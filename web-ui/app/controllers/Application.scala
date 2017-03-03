@@ -9,7 +9,7 @@ import play.api.mvc._
 class Application(implicit val config: Configuration, env: Environment) extends Controller {
 
   def index = Action {
-    Ok(views.html.index.render("SPA tutorial hack", config, env)) // views generated code is merging parameter lists
+    Ok(views.html.index.render("ShoplistR", config, env)) // views generated code is merging parameter lists
   }
 
 }

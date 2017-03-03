@@ -1,5 +1,6 @@
 package uk.co.turingatemyhamster.shoppinglinst.webClient
 
+import diode.ModelR
 import diode.react.ModelProxy
 import japgolly.scalajs.react.{ReactComponentB, ReactComponentU, ReactDOM, TopNode}
 import japgolly.scalajs.react.extra.router._
@@ -22,27 +23,14 @@ object SLRMain extends js.JSApp {
 
   sealed trait LSPages
 
-  case object Home extends LSPages
-
-  case object Login extends LSPages
-
-  case object Signup extends LSPages
-
-  case object Shoppinglists extends LSPages
-
-  case class ViewList(listId: String) extends LSPages
-
+  case object HomePage extends LSPages
 
   val routerConfig = RouterConfigDsl[LSPages].buildConfig { dsl =>
     import dsl._
 
-    (staticRoute(root, Home) ~> renderR(ctl => SLRCircuit.wrap(identity(_: UserStatus[Unit, Unit])) { proxy =>
-      proxy.value match {
-        case UserIsLoggedOut(state) =>
-          HomeLoggedOut(ctl, proxy)
-      }
-    })
-      ).notFound(redirectToPage(Home)(Redirect.Replace))
+    (
+      staticRoute(root, HomePage) ~> renderR(ctl => SLRCircuit.wrap(m => m)(proxy => Home(ctl, proxy)))
+      ).notFound(redirectToPage(HomePage)(Redirect.Replace))
   }.renderWith(layout _)
 
 
@@ -51,7 +39,7 @@ object SLRMain extends js.JSApp {
       // here we use plain Bootstrap class names as these are specific to the top level layout defined here
       <.nav(^.className := "navbar navbar-inverse navbar-fixed-top",
         <.div(^.className := "container",
-          <.div(^.className := "navbar-header", <.span(^.className := "navbar-brand", "SPA Tutorial"))
+          <.div(^.className := "navbar-header", <.span(^.className := "navbar-brand", "ShoplistR"))
         )
       ),
       // currently active module is shown in this container
@@ -71,13 +59,33 @@ object SLRMain extends js.JSApp {
   
 }
 
-object HomeLoggedOut {
+object Home {
+  def isLoggedOut[I, O](us: UserStatus[Unit, Unit]): Option[UserIsLoggedOut[O]] = us match {
+    case o : UserIsLoggedOut[O]  => Some(o)
+    case _ => None
+  }
+
   case class Props(router: RouterCtl[SLRMain.LSPages], proxy: ModelProxy[UserStatus[Unit, Unit]])
 
   private val component = ReactComponentB[Props]("Welcome")
-    .render(p => <.div("Welcome to ShoppinglistR"))
+    .render(p => <.div(
+      <.div("Welcome to ShoppinglistR"),
+      SLRCircuit.zoomMap(isLoggedOut[Unit, Unit] _)(LoginScreen.apply _)
+    ))
     .build
 
   def apply(router: RouterCtl[SLRMain.LSPages], proxy: ModelProxy[UserStatus[Unit, Unit]]) =
     component(Props(router, proxy))
+}
+
+object LoginScreen {
+  private def component = ReactComponentB[UserIsLoggedOut[Unit]]("LoginScreen")
+  .render(p => <.div(
+    <.div("Log in: "),
+    <.div("Sign up: ")
+  ))
+    .build
+
+  def apply(proxy: UserIsLoggedOut[Unit]) =
+    component(proxy)
 }
