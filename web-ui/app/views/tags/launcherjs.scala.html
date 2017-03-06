@@ -1,0 +1,7 @@
+@(toLaunch: String*)
+@path = @{toLaunch.map(l => s"""["$l"]""").mkString }
+
+<script type="text/javascript">
+        ((typeof global === "object" && global &&
+        global["Object"] === Object) ? global : this)@(Html(path))().main();
+</script>

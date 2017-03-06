@@ -1,4 +1,4 @@
-@(title: String)(implicit config: play.api.Configuration, env: play.api.Environment)
+@(userId: String, title: String)(implicit config: play.api.Configuration, env: play.api.Environment)
 @import views.html.tags._
 
 <!DOCTYPE html>
@@ -14,6 +14,8 @@
     <body>
         <div id="root">
         </div>
-        @scalajs.html.scripts(projectName = "web-react", name => _asset(name).toString, name => getClass.getResource(s"/public/$name") != null)
+        @scalajs.html.jsdeps(projectName = "web-react", name => _asset(name).toString, name => getClass.getResource(s"/public/$name") != null)
+        @scalajs.html.selectScript(projectName = "web-react", name => _asset(name).toString, name => getClass.getResource(s"/public/$name") != null)
+        @launcherjs("uk", "co", "turingatemyhamster", "shoppinglinst", "webClient", "SLRMain")
     </body>
 </html>

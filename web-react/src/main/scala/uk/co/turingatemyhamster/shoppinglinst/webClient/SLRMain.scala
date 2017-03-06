@@ -1,6 +1,5 @@
 package uk.co.turingatemyhamster.shoppinglinst.webClient
 
-import diode.ModelR
 import diode.react.ModelProxy
 import japgolly.scalajs.react.{ReactComponentB, ReactComponentU, ReactDOM, TopNode}
 import japgolly.scalajs.react.extra.router._
@@ -12,6 +11,21 @@ import scala.scalajs.js.annotation.JSExport
 import scalacss.Defaults._
 import scalacss.ScalaCssReact._
 import uk.co.turingatemyhamster.shoppinglinst.webClient.components.GlobalStyles
+
+trait ShoplistrLayout[Page] {
+  def apply(c: RouterCtl[Page], r: Resolution[Page]) = {
+    <.div(
+      // here we use plain Bootstrap class names as these are specific to the top level layout defined here
+      <.nav(^.className := "navbar navbar-inverse navbar-fixed-top",
+        <.div(^.className := "container",
+          <.div(^.className := "navbar-header", <.span(^.className := "navbar-brand", "ShoplistR"))
+        )
+      ),
+      // currently active module is shown in this container
+      <.div(^.className := "container", r.render())
+    )
+  }
+}
 
 /**
   *
@@ -31,22 +45,10 @@ object SLRMain extends js.JSApp {
     (
       staticRoute(root, HomePage) ~> renderR(ctl => SLRCircuit.wrap(m => m)(proxy => Home(ctl, proxy)))
       ).notFound(redirectToPage(HomePage)(Redirect.Replace))
-  }.renderWith(layout _)
+  }.renderWith(layout.apply _)
 
+  object layout extends ShoplistrLayout[LSPages]
 
-  def layout(c: RouterCtl[LSPages], r: Resolution[LSPages]) = {
-    <.div(
-      // here we use plain Bootstrap class names as these are specific to the top level layout defined here
-      <.nav(^.className := "navbar navbar-inverse navbar-fixed-top",
-        <.div(^.className := "container",
-          <.div(^.className := "navbar-header", <.span(^.className := "navbar-brand", "ShoplistR"))
-        )
-      ),
-      // currently active module is shown in this container
-      <.div(^.className := "container", r.render())
-    )
-  }
-  
   @JSExport
   def main(): Unit = {
     // create stylesheet
@@ -69,8 +71,8 @@ object Home {
 
   private val component = ReactComponentB[Props]("Welcome")
     .render(p => <.div(
-      <.div("Welcome to ShoppinglistR"),
-      SLRCircuit.zoomMap(isLoggedOut[Unit, Unit] _)(LoginScreen.apply _)
+      <.div("Welcome to ShoppinglistR") /*,
+      SLRCircuit.zoomMap(isLoggedOut[Unit, Unit] _)(LoginScreen.apply _)*/
     ))
     .build
 

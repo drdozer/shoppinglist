@@ -103,7 +103,7 @@ lazy val `web-react` = (project in file("web-react"))
       "org.webjars" % "log4javascript" % versions.log4js / "js/log4javascript_uncompressed.js" minified "js/log4javascript.js"
     ),
     skip in packageJSDependencies := false,
-    persistLauncher := true,
+    persistLauncher := false,
     persistLauncher in Test := false,
     testFrameworks += new TestFramework("utest.runner.Framework")
   )
