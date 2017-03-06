@@ -21,7 +21,7 @@ object AjaxClient {
         ),
         responseType = "json"
       ).map { res =>
-        read[Response](res.responseText)
+        readJs[Response](upickle.json.readJs(res.response))
       }
 
     override def get[Response : Reader](path: String): Future[Response] =
@@ -32,7 +32,7 @@ object AjaxClient {
         ),
         responseType = "json"
       ).map { res =>
-        read[Response](res.responseText)
+        readJs[Response](upickle.json.readJs(res.response))
       }
   }
 }

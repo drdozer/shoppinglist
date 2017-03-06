@@ -130,4 +130,4 @@ lazy val `web-ui` = (project in file("web-ui"))
     pipelineStages in Assets := Seq(scalaJSPipeline),
     pipelineStages := Seq(digest, gzip),
     LessKeys.compress in Assets := true
-  )
+  ).dependsOn(`user-api`)

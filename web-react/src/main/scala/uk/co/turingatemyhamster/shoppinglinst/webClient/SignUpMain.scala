@@ -1,11 +1,12 @@
 package uk.co.turingatemyhamster.shoppinglinst.webClient
 
 import scalajs.concurrent.JSExecutionContext.Implicits.runNow
-
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.prefix_<^._
 import org.scalajs.dom
+import org.scalajs.dom.raw.HTMLFormElement
 import org.scalajs.dom.window
+import uk.co.turingatemyhamster.shoppinglinst.webClient.LoginMain.userClient
 import uk.co.turingatemyhamster.shoppinglinst.webClient.services.{AjaxClient, UserClient}
 
 import scala.scalajs.js
@@ -21,36 +22,23 @@ object SignUpMain extends js.JSApp {
   val userClient = new UserClient(ajaxClient)
 
 
-  case class State(emailAddress: Option[String], userId: Option[String])
+  case class State(emailAddress: Option[String] = None, userId: Option[String] = None, emailIsAvailable: Boolean = false)
 
-  def handleLogin = CallbackTo(println("Handling login attempt"))
-  def handleEmailChanged(event: ReactEventI) = CallbackTo {
-    val email = event.target.value
-    println(s"Email changed to $email")
-    val userF = userClient.queryByEmail(UserClient.EmailAddress(email))
-    userF.onSuccess {
-      case u =>
-        println(s"Retrieved user $u for email $email")
-    }
-    userF.onFailure {
-      case t =>
-        println(s"Unhappy with email $email")
-    }
-  }
-
-  val LoginScreen = ReactComponentB[Nil.type]("login")
-    .render(p =>
+  class Backend($: BackendScope[Unit, State]) {
+    def render(s: State) =
       <.div(
         <.div(
           <.input(
             ^.`type` := "text",
             ^.placeholder := "your@email",
             ^.name := "email",
+            ^.value := s.emailAddress,
             ^.onChange ==> handleEmailChanged _
           ),
           <.button(
-            ^.onClick --> handleLogin,
-            "log in"
+            ^.onClick --> handleSignup,
+            ^.disabled := !s.emailIsAvailable,
+            "Sign up"
           )
         ),
         <.form(
@@ -59,16 +47,49 @@ object SignUpMain extends js.JSApp {
           <.input(
             ^.`type` := "hidden",
             ^.name := "userId",
-            ^.value := ""
+            ^.value := s.userId
           )
         )
       )
-    )
+
+
+    def handleSignup = $.state.map { s =>
+      println("Handling signup attempt")
+      s.emailAddress.map { e =>
+        val uF = userClient.createUser(UserClient.EmailAddress(e))
+        uF.onSuccess { case u => dom.window.location.assign("/login") }
+        uF.onFailure { case t => }
+        uF
+      }
+      ()
+    }
+
+    def handleEmailChanged(event: ReactEventI) = {
+      val email = event.target.value
+      println(s"Email changed to $email")
+      val userF = userClient.queryByEmail(UserClient.EmailAddress(email))
+      userF.onSuccess {
+        case u =>
+          println(s"Retrieved user $u for email $email")
+          $.modState(_.copy(emailIsAvailable = false)).runNow()
+      }
+      userF.onFailure {
+        case t =>
+          println(s"No user with email $email")
+          $.modState(_.copy(emailIsAvailable = true)).runNow()
+      }
+      $.modState(_.copy(emailAddress = Some(email)))
+    }
+  }
+
+  val LoginScreen = ReactComponentB[Unit]("login")
+    .initialState(State(None, None))
+    .renderBackend[Backend]
     .build
 
   @JSExport
   def main(): Unit = {
-    val screen = LoginScreen(Nil)
+    val screen = LoginScreen()
     screen render dom.document.getElementById("root")
   }
 }

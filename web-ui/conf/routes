@@ -2,4 +2,5 @@ GET     /               controllers.Application.redirectToLogin
 POST    /               controllers.Application.index
 GET     /login          controllers.Application.login
 GET     /signUp         controllers.Application.signUp
+GET     /signup         controllers.Application.signUp
 GET     /assets/*file   controllers.Assets.versioned(path = "/public", file)

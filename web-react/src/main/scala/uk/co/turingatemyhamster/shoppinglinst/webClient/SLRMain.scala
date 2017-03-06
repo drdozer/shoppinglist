@@ -33,7 +33,7 @@ trait ShoplistrLayout[Page] {
   * @author Matthew Pocock
   */
 @JSExport("SLRMain")
-object SLRMain extends js.JSApp {
+object SLRMain {
 
   sealed trait LSPages
 
@@ -50,7 +50,9 @@ object SLRMain extends js.JSApp {
   object layout extends ShoplistrLayout[LSPages]
 
   @JSExport
-  def main(): Unit = {
+  def main(userId: String): Unit = {
+    println(s"Loaded page as $userId")
+
     // create stylesheet
     GlobalStyles.addToDocument()
     // create the router

@@ -9,6 +9,7 @@ import play.api.libs.ws.ahc.AhcWSComponents
 import router.Routes
 import com.softwaremill.macwire._
 import controllers.Assets
+import uk.co.turingatemyhamster.shoppinglist.user.api.UserService
 
 import scala.collection.immutable
 import scala.concurrent.ExecutionContext
@@ -34,6 +35,8 @@ abstract class WebGateway(context: Context) extends BuiltInComponentsFromContext
     val prefix = "/"
     wire[Routes]
   }
+
+  lazy val userService = serviceClient.implement[UserService]
 
   lazy val cApplication: controllers.Application = wire[controllers.Application]
   lazy val assets: Assets = wire[Assets]
