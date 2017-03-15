@@ -1,4 +1,4 @@
-package uk.co.turingatemyhamster.shoppinglinst.webClient
+package uk.co.turingatemyhamster.shoppinglist.webClient
 
 import diode.react.ModelProxy
 import japgolly.scalajs.react.{ReactComponentB, ReactComponentU, ReactDOM, TopNode}
@@ -11,6 +11,10 @@ import scala.scalajs.js.annotation.JSExport
 import scalacss.Defaults._
 import scalacss.ScalaCssReact._
 import uk.co.turingatemyhamster.shoppinglinst.webClient.components.GlobalStyles
+import uk.co.turingatemyhamster.shoppinglinst.webClient.services.ShoppingListClient
+import uk.co.turingatemyhamster.shoppinglist.shoppinglist.api.ShoppingListService
+import uk.co.turingatemyhamster.shoppinglist.webClient.components.GlobalStyles
+import uk.co.turingatemyhamster.shoppinglist.webClient.services.ShoppingListClient
 
 trait ShoplistrLayout[Page] {
   def apply(c: RouterCtl[Page], r: Resolution[Page]) = {
@@ -37,14 +41,15 @@ object SLRMain {
 
   sealed trait LSPages
 
-  case object HomePage extends LSPages
+  case object AllListsPage extends LSPages
+  case class ListPage(listId: String) extends LSPages
 
   val routerConfig = RouterConfigDsl[LSPages].buildConfig { dsl =>
     import dsl._
 
     (
-      staticRoute(root, HomePage) ~> renderR(ctl => SLRCircuit.wrap(m => m)(proxy => Home(ctl, proxy)))
-      ).notFound(redirectToPage(HomePage)(Redirect.Replace))
+      staticRoute(root, AllListsPage) ~> renderR(ctl => SLRCircuit.wrap(m => m)(proxy => AllLists(ctl, proxy)))
+      ).notFound(redirectToPage(AllListsPage)(Redirect.Replace))
   }.renderWith(layout.apply _)
 
   object layout extends ShoplistrLayout[LSPages]
@@ -60,16 +65,11 @@ object SLRMain {
     // tell React to render the router in the document body
     ReactDOM.render(router(), dom.document.getElementById("root"))
   }
-  
+
 }
 
-object Home {
-  def isLoggedOut[I, O](us: UserStatus[Unit, Unit]): Option[UserIsLoggedOut[O]] = us match {
-    case o : UserIsLoggedOut[O]  => Some(o)
-    case _ => None
-  }
-
-  case class Props(router: RouterCtl[SLRMain.LSPages], proxy: ModelProxy[UserStatus[Unit, Unit]])
+object AllLists {
+  case class Props(router: RouterCtl[SLRMain.LSPages], proxy: ModelProxy[ShoppingListClient.ShoppingLists])
 
   private val component = ReactComponentB[Props]("Welcome")
     .render(p => <.div(
@@ -80,16 +80,4 @@ object Home {
 
   def apply(router: RouterCtl[SLRMain.LSPages], proxy: ModelProxy[UserStatus[Unit, Unit]]) =
     component(Props(router, proxy))
-}
-
-object LoginScreen {
-  private def component = ReactComponentB[UserIsLoggedOut[Unit]]("LoginScreen")
-  .render(p => <.div(
-    <.div("Log in: "),
-    <.div("Sign up: ")
-  ))
-    .build
-
-  def apply(proxy: UserIsLoggedOut[Unit]) =
-    component(proxy)
 }

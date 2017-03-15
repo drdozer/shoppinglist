@@ -1,4 +1,4 @@
-package uk.co.turingatemyhamster.shoppinglinst.webClient
+package uk.co.turingatemyhamster.shoppinglist.webClient
 
 import japgolly.scalajs.react.vdom.prefix_<^._
 import org.scalajs.dom
@@ -11,7 +11,8 @@ import scala.scalajs.js.timers._
 import japgolly.scalajs.react._
 import org.scalajs.dom.html.Input
 import org.scalajs.dom.raw.HTMLFormElement
-import uk.co.turingatemyhamster.shoppinglinst.webClient.services.{AjaxClient, UserClient}
+import uk.co.turingatemyhamster.shoppinglinst.webClient.services.UserClient
+import uk.co.turingatemyhamster.shoppinglist.webClient.services.{AjaxClient, UserClient}
 
 import scala.scalajs.js
 import scala.scalajs.js.annotation.JSExport

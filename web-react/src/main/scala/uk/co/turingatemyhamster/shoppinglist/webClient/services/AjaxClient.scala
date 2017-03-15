@@ -1,4 +1,4 @@
-package uk.co.turingatemyhamster.shoppinglinst.webClient.services
+package uk.co.turingatemyhamster.shoppinglist.webClient.services
 
 import org.scalajs.dom.ext.Ajax
 import upickle.default._

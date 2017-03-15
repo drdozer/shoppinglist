@@ -1,4 +1,4 @@
-package uk.co.turingatemyhamster.shoppinglinst.webClient
+package uk.co.turingatemyhamster.shoppinglist.webClient
 
 import scalajs.concurrent.JSExecutionContext.Implicits.runNow
 import japgolly.scalajs.react._
@@ -6,8 +6,9 @@ import japgolly.scalajs.react.vdom.prefix_<^._
 import org.scalajs.dom
 import org.scalajs.dom.raw.HTMLFormElement
 import org.scalajs.dom.window
-import uk.co.turingatemyhamster.shoppinglinst.webClient.LoginMain.userClient
-import uk.co.turingatemyhamster.shoppinglinst.webClient.services.{AjaxClient, UserClient}
+import LoginMain.userClient
+import uk.co.turingatemyhamster.shoppinglinst.webClient.services.UserClient
+import uk.co.turingatemyhamster.shoppinglist.webClient.services.{AjaxClient, UserClient}
 
 import scala.scalajs.js
 import scala.scalajs.js.annotation.JSExport

@@ -1,5 +1,6 @@
-package uk.co.turingatemyhamster.shoppinglinst.webClient.services
+package uk.co.turingatemyhamster.shoppinglist.webClient.services
 
+import upickle.Js
 import upickle.default._
 
 import scala.collection.immutable
@@ -77,5 +78,39 @@ object ShoppingListClient {
 
   object ShoppingItem {
     implicit val format: ReadWriter[ShoppingItem] = macroRW[ShoppingItem]
+  }
+
+
+  case class UserLists(has: immutable.Seq[UserHasList])
+
+  object UserLists {
+    implicit val format: ReadWriter[UserLists] = macroRW[UserLists]
+  }
+
+
+  case class UserHasList(userId: String, role: UserRole, shoppingListId: String)
+
+  object UserHasList {
+    implicit val format: ReadWriter[UserHasList] = macroRW[UserHasList]
+  }
+
+
+  sealed trait UserRole
+
+  object UserRole {
+    case object Owner extends UserRole
+    case object SharedWith extends UserRole
+
+    implicit object format extends ReadWriter[UserRole] {
+      override def write0: (UserRole) => Js.Value = {
+        case Owner => Js.Str("owner")
+        case SharedWith => Js.Str("sharedWith")
+      }
+
+      override def read0: PartialFunction[Js.Value, UserRole] = {
+        case Js.Str("owner") => Owner
+        case Js.Str("sharedWith") => SharedWith
+      }
+    }
   }
 }

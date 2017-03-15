@@ -1,4 +1,4 @@
-package uk.co.turingatemyhamster.shoppinglinst.webClient.components
+package uk.co.turingatemyhamster.shoppinglist.webClient.components
 
 import scalacss.Defaults._
 import japgolly.univeq.UnivEq

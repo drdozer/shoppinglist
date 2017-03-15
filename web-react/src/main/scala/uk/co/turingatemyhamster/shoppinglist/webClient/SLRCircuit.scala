@@ -1,4 +1,4 @@
-package uk.co.turingatemyhamster.shoppinglinst.webClient
+package uk.co.turingatemyhamster.shoppinglist.webClient
 
 import diode.Circuit
 import diode.react.ReactConnector

@@ -1,4 +1,4 @@
-package uk.co.turingatemyhamster.shoppinglinst.webClient.services
+package uk.co.turingatemyhamster.shoppinglist.webClient.services
 
 import diode.ActionResult._
 import diode.RootModelRW
